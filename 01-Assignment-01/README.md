@@ -98,3 +98,163 @@ You can list your available buckets using `aws s3 ls` command.
 
 ### Upload Objects into S3
 
+Now we need to upload our static website assets.
+
+A static webpage is one that is sent to a web browser in its identical stored format. It is sometimes referred to as a flat page or a stationary page.
+
+Until the site is redesigned or the site administrator makes changes directly in the code, the page will not be altered by anything either the user or the site administrator does on the page.
+
+Our static website assets are our html, css etc, those files you downloaded from the [html templates here](https://www.tooplate.com/).
+
+Time to upload our objects in the S3 bucket, we do that using the code below:
+
+```sh
+aws s3 cp /local/file/path s3://bucket-name --recursive
+
+aws s3 cp ./2093_flight/ s3://altschool-sem3-site --recursive
+```
+
+The recursive flag will help us upload multiple files at the same time, it will ensure that all the files and subdirectories within the specified directory are uploaded.
+
+(image 5)
+
+To verify that you have successfully uploaded the objects we will list the objects available in the bucket.
+
+Use the command below to do that:
+
+```sh
+aws s3 ls s3://bucket-name
+
+aws s3 ls s3://altschool-sem3-site
+```
+
+(image 6)
+
+You should see a list of the objects you just uploaded into your bucket. From the screenshot above you can see my uploaded objects.
+
+## Amazon CloudFront
+
+Amazon CloudFront is a content delivery network operated by Amazon Web Services. It is a service that helps you distribute your static and dynamic content quickly and reliably with high speed by using a network of proxy servers to cache content, such as web videos or other bulky media, more locally to consumers, to improve access speed for downloading the content.
+
+We will use the management console for this, log in with your IAM user and navigate to cloudfront under the Networking & Content Delivery category.
+
+When you load the cloudfront page click on `create distribution`
+
+(image 7)
+
+### CloudFront configurations
+
+- ### Origin
+
+:zap: #### Origin Domain
+
+Origins are where you store the original versions of your web content. CloudFront gets your web content from your origins and serves it to viewers via a worldwide network of edge servers.
+
+The origin domain is the DNS domain name of the Amazon S3 bucket or HTTP server from which you want CloudFront to get objects for this origin.
+
+To that effect select the S3 Bucket we created earlier, from the dropdown, as your `origin domain
+
+:zap: #### Origin path
+
+Leave this blank, as is.
+
+:zap: #### Name
+
+This will automatically be filled in when you enter your origin domain
+
+(image 8)
+
+:zap: #### Origin Access
+
+In other to further restrict the access to our Amazon S3 bucket origin to only specific CloudFront distributions we will set our `origin access` to the AWS recommended setting which is `Origin access control settings`
+
+Once that is selected, we will create a new Origin access control settings.
+
+Select the `Origin access control settings` radio button and then click on `Create new OAC`
+
+(image 9)
+
+The pop up that appears when you click on create new OAC will be populated with the necessary details, leave it as is and click on `Create`
+
+(image 10)
+
+As soon as this new AOC is created, you will see an warning (same as shown below) telling you that you will need to update your bucket policy with the policy that will be provided after the distribution is created.
+
+(image 11)
+
+- ### All Other Config
+
+For the Web Application Firewall, select `do not enable security protections`, You could actually choose to enable it if you want I am just trying to be safe and not incur any unexpected costs.
+
+The last setting you will be changing is the `default root object` type in `index.html`. This will enable cloudfront serve your index page to your site visitors.
+
+Leave all other configurations in their default settings, those settings work just fine for what we are trying to do.
+
+Your configuration should look like the screenshots below:
+
+(image 12 - 17)
+
+Scroll down to the bottom of the page and click `create distribution`
+
+(image 18)
+
+Copy the provided policy, you can see it highlighted in yellow on your screen, see screenshot above for the item labelled `1` to know where to locate it.
+
+After copying the policy click on the link to take you to the bucket in order to update the permissions with the policy you just copied.
+
+## Update Bucket Policy With Necessary Permission
+
+You could either manually navigate to the S3 bucket we have been using for this project or you could click on the link in the above picture labelled 2 to take you directly to the bucket.
+
+Once the bucket is open, click on the permissions tab. 
+
+(image 19)
+
+Scroll down to `Bucket Policy` and click on `edit` to add the permissions we copied at the end of the cloudfront distribution creation.
+
+(image 20)
+
+The copied policy is shown below, ensure you use the one you copied from your cloudfront console as it will carry your unique ARN.
+
+```json
+{
+        "Version": "2008-10-17",
+        "Id": "PolicyForCloudFrontPrivateContent",
+        "Statement": [
+            {
+                "Sid": "AllowCloudFrontServicePrincipal",
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "cloudfront.amazonaws.com"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::altschool-sem3-site/*",
+                "Condition": {
+                    "StringEquals": {
+                      "AWS:SourceArn": "arn:aws:cloudfront::<redacted>:distribution/EOE3G4O3YYZSA"
+                    }
+                }
+            }
+        ]
+      }
+```
+
+Now save your changes.
+
+Your bucket policy should now look like this:
+
+(image 21)
+
+## Access Your Site
+
+Head back to your cloudfront console and retrieve your distribution domain name as shown in the image below.
+
+(image 22)
+
+This is the address you will enter in your browser to be able to see your website.
+
+We can see from the screenshot below that cloudfront is serving the webpage correctly without have to unblock public access of our bucket.
+
+(gif)
+
+And that's it!! We have successfully served a static webpage using Amazon S3 and Amazon CloudFront.
