@@ -40,11 +40,11 @@ If you want to interact with AWS outside of the AWS Management Console and use t
 
 :zap: Simply navigate to the IAM user and scroll down to the `access key` and click on `create key`
 
-(image 1)
+![1](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/82fadd7e-079b-4ccc-bfa7-ef094b3b11ae)
 
 For the use case select the first option being `Command Line Interface (CLI)` and click on `next`
 
-(image 2)
+![2](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/aef38309-87fe-4e2c-ac8a-04e682a20a41)
 
 You can choose add a tag or not (tags will make it easier for you to identify you access key) and then go ahead to create the key.
 
@@ -84,17 +84,17 @@ Also if you set your default AWS region and you're ok with your bucket residing 
 
 I won't be using the region tag as I'm ok using my set default region.
 
-```
+```sh
 aws s3api create-bucket --bucket altschool-sem3-site
 ```
 
 If it was successful you should see something that resembles the below:
 
-(image 3)
+![3](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/e7fbe548-cdbf-4ece-bc74-b8f84c876856)
 
 You can list your available buckets using `aws s3 ls` command.
 
-(image 4)
+![4](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/6457da83-4091-4b7b-b4c2-66fa9643910d)
 
 ### Upload Objects into S3
 
@@ -116,7 +116,7 @@ aws s3 cp ./2093_flight/ s3://altschool-sem3-site --recursive
 
 The recursive flag will help us upload multiple files at the same time, it will ensure that all the files and subdirectories within the specified directory are uploaded.
 
-(image 5)
+![5](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/ee101ce3-6306-4dc7-ab50-d4a1fec2afa8)
 
 To verify that you have successfully uploaded the objects we will list the objects available in the bucket.
 
@@ -128,7 +128,7 @@ aws s3 ls s3://bucket-name
 aws s3 ls s3://altschool-sem3-site
 ```
 
-(image 6)
+![6](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/4c9c02be-78fb-4444-b1e4-2caded750ffc)
 
 You should see a list of the objects you just uploaded into your bucket. From the screenshot above you can see my uploaded objects.
 
@@ -140,13 +140,13 @@ We will use the management console for this, log in with your IAM user and navig
 
 When you load the cloudfront page click on `create distribution`
 
-(image 7)
+![7](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/c2855213-704d-4ab9-86ff-5dd111b18f04)
 
 ### CloudFront configurations
 
 - ### Origin
 
-:zap: #### Origin Domain
+#### :zap: Origin Domain
 
 Origins are where you store the original versions of your web content. CloudFront gets your web content from your origins and serves it to viewers via a worldwide network of edge servers.
 
@@ -154,17 +154,17 @@ The origin domain is the DNS domain name of the Amazon S3 bucket or HTTP server 
 
 To that effect select the S3 Bucket we created earlier, from the dropdown, as your `origin domain
 
-:zap: #### Origin path
+#### :zap: Origin path
 
 Leave this blank, as is.
 
-:zap: #### Name
+#### :zap: Name
 
 This will automatically be filled in when you enter your origin domain
 
-(image 8)
+![8](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/109c67fe-4383-4b63-b799-a090b50fc949)
 
-:zap: #### Origin Access
+#### :zap: Origin Access
 
 In other to further restrict the access to our Amazon S3 bucket origin to only specific CloudFront distributions we will set our `origin access` to the AWS recommended setting which is `Origin access control settings`
 
@@ -172,15 +172,15 @@ Once that is selected, we will create a new Origin access control settings.
 
 Select the `Origin access control settings` radio button and then click on `Create new OAC`
 
-(image 9)
+![9](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/5dd4b514-9e7f-450c-be4e-f02af5da278b)
 
 The pop up that appears when you click on create new OAC will be populated with the necessary details, leave it as is and click on `Create`
 
-(image 10)
+![10](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/4a16fc74-e79c-4980-9ba7-1fbf91b314ef)
 
 As soon as this new AOC is created, you will see an warning (same as shown below) telling you that you will need to update your bucket policy with the policy that will be provided after the distribution is created.
 
-(image 11)
+![11](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/2cf0eb7e-9916-40b9-b368-0068848c8a19)
 
 - ### All Other Config
 
@@ -192,11 +192,21 @@ Leave all other configurations in their default settings, those settings work ju
 
 Your configuration should look like the screenshots below:
 
-(image 12 - 17)
+![12](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/4cd533ec-5706-4a09-b686-6b0e339f1ec5)
+
+![13](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/687751dd-8139-49e9-80f6-d16dc8649650)
+
+![14](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/99cdf150-e3de-431c-836d-0094a2a8f331)
+
+![15](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/d6b86e0f-f625-45c5-8e3d-7f6181619d2b)
+
+![16](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/5a0410dd-e3a1-40f9-9225-40079c9d3491)
+
+![17](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/d25150f6-1393-4976-b627-ec30fd9ef618)
 
 Scroll down to the bottom of the page and click `create distribution`
 
-(image 18)
+![18](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/cd4e311a-3686-43b9-a64d-7de623144383)
 
 Copy the provided policy, you can see it highlighted in yellow on your screen, see screenshot above for the item labelled `1` to know where to locate it.
 
@@ -208,11 +218,11 @@ You could either manually navigate to the S3 bucket we have been using for this 
 
 Once the bucket is open, click on the permissions tab. 
 
-(image 19)
+![19](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/a782ba81-0306-44af-903f-26a99eece01a)
 
 Scroll down to `Bucket Policy` and click on `edit` to add the permissions we copied at the end of the cloudfront distribution creation.
 
-(image 20)
+![20](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/410fb75c-184a-4111-a27b-0c13b590dde7)
 
 The copied policy is shown below, ensure you use the one you copied from your cloudfront console as it will carry your unique ARN.
 
@@ -243,18 +253,19 @@ Now save your changes.
 
 Your bucket policy should now look like this:
 
-(image 21)
+![21](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/75a88077-5568-4ae4-8485-d6b0e68bf3ea)
 
 ## Access Your Site
 
 Head back to your cloudfront console and retrieve your distribution domain name as shown in the image below.
 
-(image 22)
+![22](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/e68dc362-e036-4a9e-b573-b6ecd2d574d8)
 
 This is the address you will enter in your browser to be able to see your website.
 
 We can see from the screenshot below that cloudfront is serving the webpage correctly without have to unblock public access of our bucket.
 
-(gif)
+![rendered-page](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/ee1d710d-6aaf-4779-bca8-6d9da72be772)
+
 
 And that's it!! We have successfully served a static webpage using Amazon S3 and Amazon CloudFront.
