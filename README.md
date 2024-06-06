@@ -8,3 +8,4 @@ This repo will contain documentations for both my assignments and the LMS exerci
 
 - [x] 1. [Assignment 1](./01-Assignment-01/) - Create a static website using Amazon S3 and Amazon Cloudfront.
 
+- [x] 2. [Holiday Challenge](./02-Holiday-challenge/) - Create 2 EC2 servers with Nginx web servers, ALB and Auto scaling.
