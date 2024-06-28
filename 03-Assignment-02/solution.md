@@ -19,7 +19,7 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
-  shared_credentials_files = "~/.aws/credentials"
+  shared_credentials_files = ["~/.aws/credentials"]
 }
 ```
 
@@ -97,4 +97,57 @@ resource "aws_s3_bucket" "site-bucket" {
 }
 ```
 
-The bucket name is supplied by a variable and will be substituted with the value at creation
+The bucket name is supplied by a variable and will be substituted with the value at creation.
+
+To test that this module works we will create an s3 bucket using this module we have jut written. Head to the `main.tf` file of your root module, outside your `Module` directory and enter the below piece of code in the file.
+
+```hcl
+module "s3-bucket" {
+  source = "./Modules/s3-bucket"
+  bucket_name = var.bucket_name
+}
+```
+
+Create two new files also in your root module called `variables.tf` and `terraform.tfvars`.
+
+In the `variables.tf` add the code below
+
+```hcl
+variable "bucket_name" {
+  type = string
+}
+```
+
+In the `terraform.tfvars` file, enter the code below:
+
+```
+bucket_name = "<your unique bucket name>
+```
+
+In your terminal, run the `terraform init` command again, your must rerun the command when you add a module or change provider. If you fail to run it and run any other terraform command you will get the below error message.
+
+(image 2)
+
+Now you can run `terraform plan` to see what terraform plans to create in your AWS account. 
+
+To create the bucket, run 
+
+```sh
+terraform apply
+``` 
+
+Whenever you run this command terraform will always ask you if you want to carry out this action, you can either answer yes or no. To avoid this question coming up you can directly include `auto approve` in the command as shown below:
+
+```sh
+terraform apply --auto-approve
+```
+
+If you followed along correctly, you would have successfully created an s3 bucket, we will destroy it and continue writing our terraform script as we are not just merely creating a bucket. 
+
+Run the command below to destroy the created bucket:
+
+```sh
+terraform destroy
+```
+
+## 
