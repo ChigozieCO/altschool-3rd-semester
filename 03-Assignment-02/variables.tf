@@ -1,4 +1,7 @@
-variable "bucket_name" {
+variable "bucket-name" {
   type = string
 }
 
+variable "web-assets-path" {
+  type = string
+}

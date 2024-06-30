@@ -1,0 +1,577 @@
+/*
+  Josh's Custom CSS Reset
+  https://www.joshwcomeau.com/css/custom-css-reset/
+*/
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+#root, #__next {
+  isolation: isolate;
+}
+
+/* main css */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: hsla(204, 33%, 97%, 1);
+  
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  width: 70%;
+  height: 51px;
+  margin: 2% auto 4%;
+}
+
+#mobilenav {
+  display: none;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.panel {
+  display: flex;
+  width: 51%;
+  height: 70%;
+  background: hsla(0, 0%, 100%, 1);
+  border: 0px solid;
+  border-radius: 6px;
+  margin: 0 auto;
+  box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.05), 0px 15px 35px 0px rgba(43, 64, 78, 0.10);
+
+}
+
+footer {
+  width: 41%;
+  height: 17px;
+  margin: 0 auto;
+  margin-block-start: 25px;
+  text-align: center;
+  color: hsla(200, 6%, 41%, 1);
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+span {
+  color: hsla(200, 49%, 38%, 1);
+}
+
+nav.navbar {
+  display: flex;
+  justify-content: space-between;
+  /* position: fixed; */
+  width: 100%;
+  height: 53px;
+  align-items: center;
+}
+
+img:not(img#pp, img#pbys, #qmark) {
+  /* position: fixed; */
+  width: 200px;
+  height: 39px;
+  background: 0px 0px / 100% 100% no-repeat;
+}
+
+ul#navigation {
+  display: flex;
+  /* position: fixed; */
+  list-style-type: none;
+  justify-content: space-between;
+  float: right;
+  width: 45%;
+  height: 40px;
+  /* margin-inline-start: 14%; */
+  padding-inline-start: 0px;
+  
+}
+
+ul#navigation li:not(:last-child) {
+  float: right;
+  margin-bottom: 25px;
+  margin-top: 10px;
+  
+}
+
+a:not(#agency), #mobilenav li:last-child {
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+  height: 17px;
+  color: hsla(211, 35%, 17%, 1);
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  letter-spacing: -0.01px;
+}
+
+#account, #mobileaccount {
+  display: flex;
+  width: 70px;
+  height: 100%;
+  border: 2px solid hsla(213, 10%, 44%, 1);
+  border-radius: 6px;
+}
+
+button li a{
+  margin-top: 8px;
+  margin-bottom: 0px;
+}
+
+p#hr {
+  width: 100%;
+  height: 2px;
+  border: 2px solid hsla(204, 18%, 90%, 1);
+  margin: 2% auto 4%;
+}
+
+section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  
+}
+
+aside {
+  width: 35%;
+  background: hsla(204, 84%, 41%, 1);
+  border: 0px solid;
+  border-radius: 0px 6px 6px 0px;
+}
+
+/* general styling of the texts in the aside */
+aside p, span#sign, span#fin, li, a#agency, blockquote, section p {
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: -0.01px;
+}
+
+aside p, span#sign, span#fin, li, a#agency, blockquote {
+  color: hsla(0, 0%, 100%, 1);
+}
+
+aside p:not(.rv), aside a, aside hr, blockquote{
+  padding-left: 35px;
+  font-weight: 700;
+}
+
+aside p:first-child {
+  padding-top: 9%;
+  font-size: 12px;
+}
+
+p span#sign {
+  display: inline-block;
+  font-size: 21px;
+  margin-top: 5px;
+  padding-right: 3px;
+}
+
+aside p:nth-child(2) {
+  display: flex;
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -0.015px;
+}
+
+p span#fin {
+  display: inline-block;
+  display: flex;
+  font-size: 15px;
+  align-items: flex-end;
+  letter-spacing: -0.015px;
+  padding-bottom: 8px;
+  font-weight: 300;
+}
+
+aside p:nth-child(3) {
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 15px; /* 150% */
+  letter-spacing: -0.008px;
+}
+
+.side>li::marker {
+  content: url(./assets/Combined-Shape.png);
+  fill: hsla(189, 100%, 86%, 1);
+  font-size: 2px;
+}
+
+ul.side li:first-child {
+  padding-top: 5%;
+}
+
+ul.side li {
+  padding-left: 11px;
+  margin-left: 9px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px; /* 150% */
+  letter-spacing: -0.008px;
+}
+
+aside p:nth-of-type(4), aside hr {
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+a#agency {
+  font-size: 12px;
+  letter-spacing: -0.008px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+aside hr {
+  width: 65%;
+  opacity: 0.2005;
+  margin-left: 35px;
+}
+
+blockquote {
+  font-size: 12px;
+  margin-top: 10px;
+  letter-spacing: -0.009px;
+  padding-right: 10px;
+  line-height: 20px;
+}
+
+div#review {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  width: 200px;
+  height: 53px;
+  
+}
+
+img#pp {
+  width: 40px;
+  height: 40px;
+  margin-left: 35px;
+  margin-top: 10px;
+  border: 0px solid;
+  border-radius: 20px;
+}
+
+
+div p.rv {
+  font-size: 14px;
+  padding-right: 40px;
+  padding-top: 20px;
+  padding-left: 10px;
+  font-weight: 700;
+  letter-spacing: -0.008px;
+}
+
+section div hr {
+  width: 100%;
+  height: 1px;
+  opacity: 0.09;
+  color: hsla(216, 33%, 97%, 1);
+}
+
+section p {
+  padding-top: 4%;
+  margin-left: 30px;
+  padding-bottom: 14px;
+  color: hsla(211, 35%, 17%, 1);
+  font-weight: 400;
+  letter-spacing: -0.16px;
+}
+
+section p:first-child {
+  font-size: 22px;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+section div.basic {
+  height: 163px;
+}
+
+section div.payment {
+  height: 103px;
+}
+
+div.nums {
+  display: flex;
+  height: 35px;
+}
+
+div span.circlednum {
+  display: inline-block;
+  font-size: 25px;
+  color: hsla(211, 49%, 55%, 1);
+  padding-top: 4.5px;
+  margin-left: 30px;
+}
+
+section div p:first-of-type {
+  margin-left: 8px;
+  padding-top: 11px;
+  font-size: 15px;
+}
+
+.fields{
+  display: flex;
+  flex-direction: row;
+}
+
+.fmfld {
+  width: 100%;
+  height: 53px;
+  display: flex;
+  flex-direction: column;
+  margin-inline-start: 30px;
+  margin-inline-end: 1.7em;
+}
+
+label {
+  width: 100%;
+  height: 25px;
+  color: hsla(211, 35%, 17%, 1);
+  font-family: Lato;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+input:not(#menu) {
+  width: 100%;
+  height: 1.8rem;
+  border: 0px solid;
+  border-radius: 4px;
+  background: hsla(216, 16%, 94%, 1);
+  padding: 10px 20px;
+  font-size: 14px;
+  /* margin-right: 18%; */
+}
+
+input#email {
+  width: 90%;
+  height: 1.8rem;
+}
+
+input#cc, input#reg {
+  width: 100%;
+  height: 1.8rem;
+}
+
+div.cc-fmfld {
+  display: flex;
+}
+
+div.cc-fmfld input:nth-of-type(1) {
+  flex: 3;
+}
+div.cc-fmfld input:nth-of-type(2) {
+  flex: 1;
+}
+div.cc-fmfld input:nth-of-type(3) {
+  flex: 0.5;
+}
+
+input#reg {
+  margin-top: 18px;
+  background-color: hsla(173, 96%, 28%, 1);
+  height: 2.3rem;
+  color: hsla(0, 0%, 100%, 1);
+  font-weight: 700;
+  letter-spacing: -0.396px;
+}
+
+p#foot {
+  font-size: 14px;
+}
+
+img#pbys {
+  width: 72px;
+  height: 15px;
+  display: inline-block;
+  margin-left: 180px;
+}
+
+div img#qmark {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-top: 18px;
+}
+
+div.mask {
+  display: flex;
+  width: 80%;
+  height: 42px;
+  flex-direction: row;
+  margin-left: 15%;
+  margin-top: 1.5px 
+}
+
+p#foot1 {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01px;
+  color: hsla(211, 35%, 17%, 1);
+}
+
+span#foot2 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: -0.01px;
+  color: hsla(213, 10%, 44%, 1);
+}
+
+@media (max-width: 999px) {
+  aside {
+    width: 45%
+  }
+}
+
+@media (max-width: 900px) {
+  header {
+    margin: 1.5% 10% 3%;
+    width: 83%;
+    height: max-content;
+  }
+
+  img:not(img#pp, img#pbys, #qmark) {
+    width: 130px
+  }
+
+  nav.navbar{
+    z-index: 9999;  
+  }
+
+  ul#navigation {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: block;
+  }
+
+  ul#mobilenav {
+    display: block;
+  }
+
+  .mobile-menu label {
+    font-family: 'Hammersmith One', sans-serif;
+    font-size: 25px;
+    font-weight: 700;
+    display: block;
+    cursor: pointer;
+    background: url(./assets/menu-bar.png) no-repeat right center;
+    background-size: 40px;
+    padding: 0px 50px 0px 0px;
+    height: 39px;
+    position: relative;
+    color: hsla(212, 100%, 19%, 1);
+    letter-spacing: -0.01px;
+  }
+
+  .menu-content {
+    font-family: 'Lato', sans-serif; 
+    padding: 0 0 0 0px;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 0 0 50px;
+    position: absolute;
+    left: 10px;
+    width: 95%;
+    background-color: hsla(204, 33%, 97%, 0.9);
+  }
+
+  #mobilenav li:first-child {
+    margin-block-start: 30px;
+  }
+
+  .mobile-menu {
+    background-color: hsla(204, 33%, 97%, 1);
+    padding: 0px 0px;
+    /* border-bottom: 2px solid hsla(204, 18%, 90%, 1); */
+    /* box-shadow: 1px 2px 3px rgba(0,0,0,0.2); */
+  }
+
+  .mobile-menu ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  #mobilenav a, #mobilenav li:last-child {
+    display:block;
+    /* padding: 10px; */
+    text-decoration: none;
+    width: 100%;
+    height: 40px;
+  }
+
+  #mobileaccount {
+    margin: auto;
+  }
+
+  input#menu {
+    display: none;
+  }
+
+  input:checked +label {
+    background-image: url(./assets/close-button.png);
+    background-size: 45px;
+  }
+
+  input:checked ~ label {
+    background-image: url(./assets/close-button.png);
+    background-size: 45px;
+  }
+
+  input:checked ~ .menu-content {
+    max-height: 100%;
+  }
+
+  .panel {
+    flex-direction: column;
+    width: 85%;
+  }
+
+  aside {
+    width: 100%;
+  }
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Hammersmith+One&family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <title>Wp Pusher</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <nav class="navbar">
+        <img src="./assets/wp-pusher.png" alt="wp-pusher-logo">
+        
+        <ul id="navigation">
+          <li><a href="./download">Download</a></li>
+          <li><a href="./learn-more">Learn more</a></li>
+          <li><a href="./pricing">Pricing</a></li>
+          <li><a href="./help">Help</a></li>
+          <button id="account"><li><a href="./account">Account</a></li></button>
+        </ul>
+
+        <!-- Collapsible menu for the mobile view -->
+        <div class="mobile-menu">
+          <input type="checkbox" id="menu">
+          <label for="menu">Menu</label>
+          <div class="menu-content">
+            <ul id="mobilenav">
+              <li><a href="./download">Download</a></li>
+              <li><a href="./learn-more">Learn more</a></li>
+              <li><a href="./pricing">Pricing</a></li>
+              <li><a href="./help">Help</a></li>
+              <li><button id="mobileaccount"><a href="./account">Account</a></button></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <p id="hr"></p>
+    </header>
+
+    <main class="panel">
+      <section>
+        <p>Checkout</p>
+
+        <div class="basic">
+          <hr />
+
+          <div class="nums">
+          <span class="circlednum">&#10112;</span> 
+          <p>Your Basic Information</p>
+          </div>
+
+          <div class="fields">
+            <div class="fmfld">
+              <label for="fname">First Name</label>
+              <input type="text" id="fname" name="Firstname" placeholder="Jane" required />
+            </div>
+            
+            <div class="fmfld">
+              <label for="lname">Last Name</label>
+              <input type="text" id="lname" name="Lastname" placeholder="Doe"required />
+            </div>
+          </div>
+
+          <div class="fields">
+            <div class="fmfld">
+              <label for="email">E-mail</label>
+              <input type="text" id="email" name="password" placeholder="janedoe@example.com" />
+            </div>
+          </div>
+
+        </div>
+
+        <div class="payment">
+          <hr />
+
+          <div class="nums">
+            <span class="circlednum">&#10113;</span> 
+            <p>Your Payment Information</p>
+          </div>
+
+          <div class="fields">
+            <div class="fmfld">
+              <label for="cc">Credit Card</label>
+              <div class="cc-fmfld">
+                <input type="text" id="cc" name="creditcard" placeholder="Card Number" />
+                <input type="text" placeholder="MM/YY" required="">
+                <input type="text" placeholder="CVC" required="">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="buywp">
+          <hr />
+
+          <div class="fields">
+            <div class="fmfld">
+              <input type="submit" id="reg" value="Buy WP Pusher" />
+            </div>
+          </div>
+
+          <div class="mask">
+            <img src="./assets/Mask.png" alt="questionmark" id="qmark">
+            <p id="foot1">Need any help? <span id="foot2">Don't hesitate to contact support!</span></p>
+          </div>
+
+          <img src="./assets/powered_by_stripe.png" alt="powered-by-stripe" id="pbys">
+
+        </div>
+      </section>
+
+      <aside>
+        <p>Freelancer</p>
+
+        <p><span id="sign">$</span> 99 <span id="fin">/ year</span></p>
+
+        <p>Automatically renews<br /> after 1 year</p>
+
+        <ul class="side">
+          <li>Use on 5 client sites</li>
+          <li>Private repositories</li>
+          <li>Email support</li>
+        </ul>
+
+        <p>Need 20 client sites?</p>
+
+        <a href="./agency" id="agency">Switch to the <i>Agency</i> plan.</a>
+
+        <hr />
+
+        <blockquote>FTP is horrible to deal with.<br />
+        <em>WP Pusher</em> solves that issue,<br /> and the customer support is awesome!</blockquote>
+        
+        <div id="review">
+          <img src="./assets/Bitmap.png" alt="profilepic" id="pp">
+
+          <p class="rv">Kirk Beard</p>
+
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <p>&copy; 2018 WP Pusher IVS · <span> Terms of Service</span></p>
+    </footer>
+  </div>
+</body>
+</html>

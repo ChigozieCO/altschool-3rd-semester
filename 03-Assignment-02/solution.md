@@ -68,14 +68,14 @@ For my S3 bucket module, I created a directory named `s3-bucket` in the `Modules
 In the `variables.tf` I define the bucket name as a variable with the code below:
 
 ```hcl
-variable "bucket_name" {
+variable "bucket-name" {
   description = "The name of the S3 bucket"
   type        = string
 
   validation {
     condition     = (
-      length(var.bucket_name) >= 3 && length(var.bucket_name) <= 63 && 
-      can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", var.bucket_name))
+      length(var.bucket-name) >= 3 && length(var.bucket-name) <= 63 && 
+      can(regex("^[a-z0-9][a-z0-9-.]*[a-z0-9]$", var.bucket-name))
     )
     error_message = "The bucket name must be between 3 and 63 characters, start and end with a lowercase letter or number, and can contain only lowercase letters, numbers, hyphens, and dots."
   }
@@ -92,7 +92,7 @@ Now to the creation of the S3 bucket, we will add the `aws_s3_bucket` resource b
 
 ```hcl
 resource "aws_s3_bucket" "site-bucket" {
-  bucket = var.bucket_name
+  bucket = var.bucket-name
   force_destroy = true
 }
 ```
@@ -104,7 +104,7 @@ To test that this module works we will create an s3 bucket using this module we 
 ```hcl
 module "s3-bucket" {
   source = "./Modules/s3-bucket"
-  bucket_name = var.bucket_name
+  bucket-name = var.bucket-name
 }
 ```
 
@@ -113,7 +113,7 @@ Create two new files also in your root module called `variables.tf` and `terrafo
 In the `variables.tf` add the code below
 
 ```hcl
-variable "bucket_name" {
+variable "bucket-name" {
   type = string
 }
 ```
@@ -121,8 +121,14 @@ variable "bucket_name" {
 In the `terraform.tfvars` file, enter the code below:
 
 ```
-bucket_name = "<your unique bucket name>
+bucket-name = "<your unique bucket name>
 ```
+
+:warning: **NOTE**
+
+Your `.tfvars` file should never be committed to version control, ad this file to your `.gitignore` file. Check out my [`.gitignore` file](https://github.com/ChigozieCO/altschool-3rd-semester/blob/main/03-Assignment-02/.gitignore) for files to add to yours.
+
+You can also use [this site](https://www.toptal.com/developers/gitignore/) to generate your gitignore files for this project and future projects.
 
 In your terminal, run the `terraform init` command again, your must rerun the command when you add a module or change provider. If you fail to run it and run any other terraform command you will get the below error message.
 
@@ -150,4 +156,125 @@ Run the command below to destroy the created bucket:
 terraform destroy
 ```
 
-## 
+## TF alias for Terraform
+
+Before we continue, I want to set a short alias for terraform as we will need to call terraform a whole lot. Setting terraform alias to be `tf` will help simplify things for us when we are calling our commands, so we will no longer need to explicitly call out `terraform` but now we call it `tf` eg `tf apply` instead of `terraform apply`. It helps us shorten our command.
+
+We can do this by setting up an alias in the bash profile.
+
+To open the bash profile for the terminal, I used the below command:
+
+```sh
+vi ~/.bash_profile
+```
+
+This is where we can set bash configurations, we set our alias by calling alias with the short form as seen:
+
+```sh
+alias tf="terraform"
+```
+
+To now use the command we set as alias we need to run that bash profile script first so that the change is applied.
+
+```sh
+source ~/.bash_profile
+```
+
+Now I can use tf instead of terraform
+
+## Upload Assets Into S3 Bucket
+
+Before writing the code to upload our website assets into the bucket we should create a directory and save our assets. I will save this in our root module as `web-assets` and add my website assets in there.
+
+#### modules/s3-bucket/main.tf
+
+We will use the `for_each` meta arguments to upload our bucket assets, we are using this approach as we have multiple files to upload. this is useful when you create multiple resources with similar configurations. 
+
+It does not make sense to just copy and paste the Terraform resource blocks with minor tweaks in each block. Doing this only affects the readability and unnecessarily lengthens the IaC configuration files. Add the below code to your s3-bucket module `main.tf` file:
+
+```hcl
+# Upload objects into the s3 Bucket
+resource "aws_s3_object" "upload-assets" {
+  for_each = fileset("${var.web-assets-path}", "**/*")
+  bucket = aws_s3_bucket.site-bucket.id
+  key = each.value
+  source = "${var.web-assets-path}/${each.value}"
+  content_type = lookup(var.mime_types, regex("\\.[^.]+$", each.value), "application/octet-stream")
+}
+```
+
+The `for-each` will iterate through the files in the website directory. I used the `fileset` function to iterates over all files and directories in the specified path, making each file/directory available to the for_each loop in the resource definition. 
+
+The path isn't hardcoded, it is defined as a variable in the `variable.tf` file as you will see below.
+
+The `for_each` loop over `fileset` returns file paths, not key-value pairs, this is why we use `each.value` as our key and not `each.key`.
+
+We want the website to recognise each file type for it's correct respective MIME type an display it properly on the website and that is why we used the `lookup` function in the `content_type` argument. `lookup(map, key, default)` is a function that searches for key in map and returns the associated value if found. If key is not found, it returns default.
+
+The regex function extracts the file extension from each.value, which is the file name obtained from fileset in other to determine a more accurate MIME type.
+
+#### modules/s3-bucket/variables.tf
+
+Here we will define the variables we called in the piece of code above, add the below code to the file:
+
+```hcl
+# Set the variable for the file path of the files to be uploaded to the bucket
+variable "web-assets-path" {
+  description = "This is the location of our website files"
+  type = string
+}
+
+variable "mime_types" {
+  description = "Map of file extensions to MIME types"
+  type        = map(string)
+  default = {
+    ".html" = "text/html"
+    ".css"  = "text/css"
+    ".png"  = "image/png"
+    ".jpg"  = "image/jpeg"
+    ".jpeg" = "image/jpeg"
+    ".pdf"  = "application/pdf"
+    "json" = "application/json"
+    "js"   = "application/javascript"
+    "gif"  = "image/gif"
+    # Add more extensions and MIME types as needed
+  }
+}
+```
+
+## Update Root Module `main.tf`, `variable.tf` and `terraform.tfvars` Files
+
+#### `main.tf`
+
+we updated our module and so we need to update our root module configuration as well. Your root module's `main.tf` file should now look like this:
+
+```hcl
+module "s3-bucket" {
+  source = "./Modules/s3-bucket"
+  bucket-name = var.bucket-name
+  web-assets-path = var.web-assets-path
+}
+```
+
+#### `variable.tf`
+
+Your root module's `variable.tf` file should now look like this:
+
+```hcl
+variable "bucket-name" {
+  type = string
+}
+
+variable "web-assets-path" {
+  type = string
+}
+```
+
+#### `terraform.tfvars`
+
+Your root module's `terraform.tfvars` file should now look like this:
+
+```
+bucket-name = "<your unique bucket name>
+web-assets-path = "<the path to your website files>
+```
