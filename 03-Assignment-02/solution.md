@@ -99,6 +99,23 @@ resource "aws_s3_bucket" "site-bucket" {
 
 The bucket name is supplied by a variable and will be substituted with the value at creation.
 
+#### `modules/s3-bucket/outputs.tf`
+
+This is the file in which we will output some of the values we will use in the rest of our configurations.
+
+Go ahead and create a new file called `outputs.tf` in the s3 bucket module add the below code to the file:
+
+```hcl
+output "bucket_regional_domain_name" {
+  description = "This is the bucket domain name including the region name."
+  value = aws_s3_bucket.site-bucket.bucket_regional_domain_name
+}
+```
+
+## Add the S3 Bucket to the Root Module
+
+#### `main.tf`
+
 To test that this module works we will create an s3 bucket using this module we have jut written. Head to the `main.tf` file of your root module, outside your `Module` directory and enter the below piece of code in the file.
 
 ```hcl
@@ -108,7 +125,9 @@ module "s3-bucket" {
 }
 ```
 
-Create two new files also in your root module called `variables.tf` and `terraform.tfvars`.
+#### `variables.tf`
+
+Create three new files also in your root module called `variables.tf`, `outputs.tf` and `terraform.tfvars`.
 
 In the `variables.tf` add the code below
 
@@ -117,6 +136,20 @@ variable "bucket-name" {
   type = string
 }
 ```
+
+#### `outputs.tf`
+
+In the `outputs.tf` add the following code:
+
+```hcl
+output "bucket-name" {
+  value = module.s3-bucket.site-bucket.bucket_regional_domain_name
+}
+```
+
+We will make use of this output when creating our cloudfront distribution.
+
+#### `terraform.tfvars`
 
 In the `terraform.tfvars` file, enter the code below:
 
@@ -278,3 +311,6 @@ Your root module's `terraform.tfvars` file should now look like this:
 bucket-name = "<your unique bucket name>
 web-assets-path = "<the path to your website files>
 ```
+
+# Create CloudFront Module
+
