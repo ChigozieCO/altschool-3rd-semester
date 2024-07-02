@@ -33,3 +33,8 @@ variable "default_root_object" {
   type = string
   default = "index.html"
 }
+
+variable "domain_name" {
+  description = "your custom Domain name for which the certificate should be issued"
+  type = string
+}

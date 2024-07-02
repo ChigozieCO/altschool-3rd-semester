@@ -9,15 +9,9 @@ resource "aws_cloudfront_origin_access_control" "assign-oac" {
 
 # Create CloudFront Distribution
 resource "aws_cloudfront_distribution" "cdn" {
-  depends_on = [ 
-    aws_cloudfront_origin_access_control.assign-oac,
-    module.s3-bucket.site-bucket,
-    module.certificate.aws_acm_certificate.cert
-    ]
-
   origin {
-    domain_name = module.s3-bucket.bucket_regional_domain_name
-    origin_id = module.s3-bucket.bucket_regional_domain_name
+    domain_name              = module.s3-bucket.bucket_regional_domain_name
+    origin_id                = module.s3-bucket.bucket_regional_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.assign-oac.id
   }
 
@@ -34,7 +28,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     forwarded_values {
       query_string = false
       cookies {
-        forward = "all"
+        forward    = "all"
       }
     }
   }
@@ -46,10 +40,14 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn = module.certificate.aws_acm_certificate.cert.arn
+    acm_certificate_arn            = module.certificate.aws_acm_certificate.cert.arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
+    cloudfront_default_certificate = false
   }
 
-  enabled = true
-  is_ipv6_enabled = true
+  enabled             = true
+  is_ipv6_enabled     = true
   default_root_object = var.default_root_object
+  aliases             = [var.domain_name, "www.${var.var.domain_name}"] 
 }
