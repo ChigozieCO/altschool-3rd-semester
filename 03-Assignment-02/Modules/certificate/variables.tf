@@ -15,6 +15,12 @@ variable "subject_alternative_names" {
   default = []
 }
 
-variable "validation_record_fqdns" {
-  type = string
-}
+# variable "validation_record_fqdns" {
+#   description = "The FQDNs of the validation records."
+#   type        = list(string)
+# }
+
+# variable "route53_dns_records" {
+#   description = "The DNS records in Route 53 module to depend on."
+#   type        = any
+# }

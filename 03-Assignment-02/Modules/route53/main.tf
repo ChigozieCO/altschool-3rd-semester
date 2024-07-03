@@ -1,33 +1,45 @@
-
+# Retrieve information about your hosted zone from AWS
+data "aws_route53_zone" "created" {
+  name = var.domain_name
+}
 
 # Create DNS record that will be used for our certificate validation
-resource "aws_route53_record" "cert-dns" {
-  allow_overwrite = true
-  name            = var.cert-dns-name-and-type[0]
-  records         = var.cert-dns-records
-  type            = var.cert-dns-name-and-type[1]
-  zone_id         = var.route53-hosted-zone-id
-  ttl             = 60
+resource "aws_route53_record" "cert_validation" {
+  for_each   = { for dvo in var.domain_validation_options : dvo.domain_name => {
+    name     = dvo.resource_record_name
+    type     = dvo.resource_record_type
+    record   = dvo.resource_record_value
+  } }
+
+  name       = each.value.name
+  type       = each.value.type
+  records    = [each.value.record]
+  ttl        = 60
+  zone_id  = data.aws_route53_zone.created.zone_id
 }
 
-# Create an alias that will point to the cloudfront distribution domain name
-resource "aws_route53_record" "alias" {
-  zone_id = var.route53-hosted-zone-id
-  name    = var.domain_name
-  type    = "A"
+# resource "aws_route53_record" "cert_validation" {
+#   count   = length(var.domain_validation_options)
+#   name    = var.domain_validation_options[count.index].resource_record_name
+#   type    = var.domain_validation_options[count.index].resource_record_type
+#   records = [var.domain_validation_options[count.index].resource_record_value]
+#   ttl     = 60
+#   zone_id = data.aws_route53_zone.created.zone_id
+# }
 
-  alias {
-    name                   = var.cloudfront_domain_name
-    zone_id                = var.cloudfront-zone-id
-    evaluate_target_health = false
-  }
-}
+# # Create CNAME Record for WWW Subdomain
+# resource "aws_route53_record" "www" {
+#   zone_id = data.aws_route53_zone.created.zone_id
+#   name    = "www.${var.domain_name}"
+#   type    = "CNAME"
+#   ttl     = 300
+#   records = [var.domain_name]
+# }
 
-# Create CNAME Record for WWW Subdomain
-resource "aws_route53_record" "www" {
-  zone_id = var.cloudfront-zone-id
-  name    = "www.${var.domain_name}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [var.domain_name]
+# Validate the certificate
+resource "aws_acm_certificate_validation" "validate-cert" {
+  certificate_arn = var.certificate_arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+
+  depends_on = [aws_route53_record.cert_validation]
 }

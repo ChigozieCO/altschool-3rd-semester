@@ -9,9 +9,10 @@ module "s3-bucket" {
 module "certificate" {
   source = "./Modules/certificate"
   domain_name = var.domain_name
-  validation_record_fqdns = module.route53.cert_dns_fqdn
   subject_alternative_names  = ["www.${var.domain_name}"]
-}
+  # validation_record_fqdns = module.route53.cert_validation_record_fqdns
+  # route53_dns_records = module.route53.dns_records
+  }
 
 # Create OAC and cloudfront distribution, 
 module "cloudfront" {
@@ -19,34 +20,47 @@ module "cloudfront" {
   domain_name = var.domain_name
   cdn-domain_name-and-origin_id = module.s3-bucket.bucket_regional_domain_name
   acm_certificate_arn = module.certificate.cert-arn
+  depends_on = [ module.route53 ]
 }
 
 # Import the hosted zone from AWS, create dns records for certificate validation, and create A and CNAME records.
 module "route53" {
   source = "./Modules/route53"
   domain_name = var.domain_name
-  cert-dns-name-and-type =[
-    module.certificate.domain_validation_options[0].resource_record_name,
-    module.certificate.domain_validation_options[0].resource_record_type
-  ]
-  cert-dns-records = [module.certificate.domain_validation_options[0].resource_record_value]
+  domain_validation_options = module.certificate.domain_validation_options
+  certificate_arn = module.certificate.cert-arn
+  # cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
+  # cloudfront-zone-id = module.cloudfront.cloudfront_hosted-zone_id
+  # depends_on = [ module.cloudfront ]
+}
+
+# module "hosted-zone" {
+#   source = "./Modules/hosted-zone"
+#   domain_name = var.domain_name
+# }
+
+# # Retrieve information about your hosted zone from AWS
+# data "aws_route53_zone" "created" {
+#   name = var.domain_name
+# }
+
+# # Import the already created hosted zone
+# import {
+#   to = module.hosted-zone.aws_route53_zone.assign-domain
+#   id = data.aws_route53_zone.created.zone_id
+# }
+
+# # Validate the certificate
+# resource "aws_acm_certificate_validation" "cert_validation" {
+#   certificate_arn         = module.certificate.cert-arn
+#   validation_record_fqdns = module.route53.cert_validation_record_fqdns
+#   depends_on = [module.route53]
+# }
+
+module "alias" {
+  source = "./Modules/alias"
+  domain_name = var.domain_name
   cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
   cloudfront-zone-id = module.cloudfront.cloudfront_hosted-zone_id
-  route53-hosted-zone-id = module.hosted-zone.hosted-zone-zone_id
-}
-
-module "hosted-zone" {
-  source = "./Modules/hosted-zone"
-  domain_name = var.domain_name
-}
-
-# Retrieve information about your hosted zone from AWS
-data "aws_route53_zone" "created" {
-  name = var.domain_name
-}
-
-# Import the already created hosted zone
-import {
-  to = module.hosted-zone.aws_route53_zone.assign-domain
-  id = data.aws_route53_zone.created.zone_id
+  depends_on = [ module.cloudfront ]
 }
