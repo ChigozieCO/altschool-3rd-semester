@@ -5,3 +5,8 @@ variable "bucket-name" {
 variable "web-assets-path" {
   type = string
 }
+
+variable "domain_name" {
+  type = string
+}
+

@@ -4,3 +4,22 @@ variable "domain_name" {
   type = string
 }
 
+variable "cert-dns-name-and-type" {
+  type = list(string)
+}
+
+variable "cert-dns-records" {
+  type = list(string)
+}
+
+variable "cloudfront_domain_name" {
+  type = string
+}
+
+variable "cloudfront-zone-id" {
+  type = string
+}
+
+variable "route53-hosted-zone-id" {
+  type = string
+}

@@ -38,3 +38,11 @@ variable "domain_name" {
   description = "your custom Domain name for which the certificate should be issued"
   type = string
 }
+
+variable "cdn-domain_name-and-origin_id" {
+  type = string
+}
+
+variable "acm_certificate_arn" {
+  type = string
+}

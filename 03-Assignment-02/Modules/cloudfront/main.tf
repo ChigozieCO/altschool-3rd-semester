@@ -10,8 +10,8 @@ resource "aws_cloudfront_origin_access_control" "assign-oac" {
 # Create CloudFront Distribution
 resource "aws_cloudfront_distribution" "cdn" {
   origin {
-    domain_name              = module.s3-bucket.bucket_regional_domain_name
-    origin_id                = module.s3-bucket.bucket_regional_domain_name
+    domain_name              = var.cdn-domain_name-and-origin_id
+    origin_id                = var.cdn-domain_name-and-origin_id
     origin_access_control_id = aws_cloudfront_origin_access_control.assign-oac.id
   }
 
@@ -20,7 +20,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = [ "GET", "HEAD" ]
     cached_methods         = [ "GET", "HEAD" ]
-    target_origin_id       = module.s3-bucket.bucket_regional_domain_name
+    target_origin_id       = var.cdn-domain_name-and-origin_id
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
@@ -40,7 +40,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = module.certificate.aws_acm_certificate.cert.arn
+    acm_certificate_arn            = var.acm_certificate_arn
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2021"
     cloudfront_default_certificate = false
@@ -49,5 +49,5 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.default_root_object
-  aliases             = [var.domain_name, "www.${var.var.domain_name}"] 
+  aliases             = [var.domain_name, "www.${var.domain_name}"] 
 }

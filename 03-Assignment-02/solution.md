@@ -468,7 +468,7 @@ The code for the actual validation is seen below:
 # Validate the certificate
 resource "aws_acm_certificate_validation" "validate-cert" {
   certificate_arn = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [module.route53.aws_route53_record.cert-dns.fqdn]
+  validation_record_fqdns = [module.route53.cert_dns_fqdn]
 }
 ```
 
@@ -535,7 +535,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = module.certificate.aws_acm_certificate.cert.arn
+    acm_certificate_arn            = module.certificate.cert-arn
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2021"
     cloudfront_default_certificate = false
@@ -626,8 +626,8 @@ resource "aws_route53_record" "alias" {
   type    = "A"
 
   alias {
-    name                   = module.cloudfront.aws_cloudfront_distribution.cdn.domain_name
-    zone_id                = module.cloudfront.aws_cloudfront_distribution.cdn.hosted_zone_id
+    name                   = module.cloudfront.cloudfront_domain_name
+    zone_id                =  module.cloudfront.cloudfront_hosted_zone_id
     evaluate_target_health = false
   }
 }
@@ -641,10 +641,19 @@ Create a CNAME record in Route 53 for the www subdomain to point to the main dom
 
 ```hcl
 resource "aws_route53_record" "www" {
-  zone_id = module.cloudfront.aws_cloudfront_distribution.cdn.hosted_zone_id
+  zone_id =  module.cloudfront.cloudfront_hosted_zone_id
   name    = "www.${var.domain_name}"
   type    = "CNAME"
   ttl     = 300
   records = [var.domain_name]
 }
 ```
+
+# Putting it all Together: Move Modules into the Root Module
+
+It's now time to put our modules to use in building our infrastructure. We do this by calling the module in the `main.tf` file of our root module, this is our main configuration file.
+
+#### `main.tf`
+
+We had previously added our s3-bucket module to our main.tf earlier in the project when we wanted to test out our s3-bucket module, now we will add the rest of our modules to the `main.tf`.
+

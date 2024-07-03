@@ -12,5 +12,9 @@ variable "validation_method" {
 variable "subject_alternative_names" {
   description = "Set of domains that should be SANs in the issued certificate."
   type = list(string)
-  default = ["www"]
+  default = []
+}
+
+variable "validation_record_fqdns" {
+  type = string
 }

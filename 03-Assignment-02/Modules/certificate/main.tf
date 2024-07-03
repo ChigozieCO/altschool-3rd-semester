@@ -13,5 +13,5 @@ resource "aws_acm_certificate" "cert" {
 # Validate the certificate
 resource "aws_acm_certificate_validation" "validate-cert" {
   certificate_arn = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [module.route53.aws_route53_record.cert-dns.fqdn]
+  validation_record_fqdns = [var.validation_record_fqdns]
 }
