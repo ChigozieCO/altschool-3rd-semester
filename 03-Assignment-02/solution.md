@@ -466,10 +466,10 @@ resource "aws_route53_record" "cert_validation" {
 }
 ```
 
-The code above will create a CNAME record in your domain's hosted zone which will be used to validate the certificate which you created. However if you try to apply the code to create te certificate and create the record at the same time, yu will get an error message that looks like the own below
+The code above will create a CNAME record in your domain's hosted zone which will be used to validate the certificate which you created. However if you try to apply the code to create te certificate and create the record at the same time, you will get an error message that looks like the own below
 
 
-(image ? for_each error)
+(image 7 for_each error)
 
 This is why we will run the `terraform apply` command in two stages as you will see eventually.
 
@@ -775,9 +775,9 @@ variable "cloudfront-zone-id" {
 
 It's now time to put our modules to use in building our infrastructure. We do this by calling the module in the `main.tf` file of our root module, this is our main configuration file.
 
-#### `main.tf`
-
 We had previously added our s3-bucket module to our main.tf earlier in the project when we wanted to test out our s3-bucket module, now we will add the rest of our modules to the `main.tf`.
+
+#### `main.tf`
 
 Your final configuration in your `main.tf` of your root module should look like this:
 
@@ -851,4 +851,70 @@ web-assets-path = "<the path to your website files (best to supply the absolute 
 domain_name = "<your custom domain name>"
 ```
 
-Now we are all set to deploy our application
+Now we are all set to deploy our application.
+
+# Create the Infrastructure
+
+### Install Modules
+
+First run `tf init` to install all the added modules.
+
+```sh
+tf init
+```
+
+(image 4)
+
+### Validate Configuration
+
+Next you can run the validate command to validate your configuration
+
+```sh
+tf validate
+```
+
+### Create Infrastructure
+
+As I already explained earlier the `for_each` function will only iterate on values that are already known at the time the `apply` command is , therefore if we were to apply before creating our certificate terraform will thrown an error.
+
+To avoid this error we will apply in two stages, first with the `--target` flag and then apply the whole configuration.
+
+First run:
+
+```sh
+tf apply --target module.certificate
+```
+
+(image 13)
+(image 8)
+(image 9)
+
+Lastly, create the remaining resources:
+
+```sh
+tf apply
+```
+
+(image 10)
+(image 14)
+
+### Confirm Build
+
+You can open your AWS console to see that the resources have been built.
+
+Open your browser and navigate to your custom domain and you will see that your website is showing, here is mine.
+
+(image 11)
+
+# Cleanup
+
+Remember to clean up your environment when you are done. Don't leave the resources running in AWS to avoid unnecessary billing.
+
+Use the destroy command:
+
+```sh
+tf destroy
+```
+
+(image 12)
+(image 15)

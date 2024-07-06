@@ -65,3 +65,7 @@ module "alias" {
   cloudfront-zone-id = module.cloudfront.cloudfront_hosted-zone_id
   depends_on = [ module.cloudfront ]
 }
+
+
+# Run terraform apply --target module.certificate first
+# Then run terraform apply to build the rest.
