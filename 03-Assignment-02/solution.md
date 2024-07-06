@@ -45,7 +45,7 @@ Ensure you are in your project directory and run the below command in your termi
 terraform init
 ```
 
-(image 1)
+![tf-init](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/d4234819-c717-4973-b0bd-281422e68a76)
 
 # Terraform Modules
 
@@ -172,7 +172,7 @@ You can also use [this site](https://www.toptal.com/developers/gitignore/) to ge
 
 In your terminal, run the `terraform init` command again, you must rerun the command when you add a module or change provider. If you fail to run it and run any other terraform command you will get the below error message.
 
-(image 2)
+![uninstalled-module-error](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/dd7f92a8-8059-4ad9-877c-cdb8011331d6)
 
 Now you can run `terraform plan` to see what terraform plans to create in your AWS account. 
 
@@ -323,7 +323,7 @@ web-assets-path = "<the path to your website files (best to supply the absolute 
 
 :warning: Note 
 
-Even if you are still eligible for the AWS free tier, the Route53 service is never free. This hosted zone will attract a charge of $0.50 per month.
+>Even if you are still eligible for the AWS free tier, the Route53 service is never free. This hosted zone will attract a charge of $0.50 per month.
 
 You need a custom domain name for this step, so if you don't already have one, pause, get one and continue along.
 
@@ -343,7 +343,7 @@ Since we already know this, we will manually create the hosted zone, add the nam
 - You can add a tag and description if you want.
 - At the bottom of the page, click on `create hosted zone`.
 
-(image 3)
+![hosted-zone](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/1c7cadca-fe58-46a4-b5a7-d4253b306863)
 
 - Once your hosted zone has been created, open it to view details and copy the name servers supplied by AWS.
 - Copy each name server and replace those already in our domain name with these new ones.
@@ -469,7 +469,7 @@ resource "aws_route53_record" "cert_validation" {
 The code above will create a CNAME record in your domain's hosted zone which will be used to validate the certificate which you created. However if you try to apply the code to create te certificate and create the record at the same time, you will get an error message that looks like the own below
 
 
-(image 7 for_each error)
+![for_each-error](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/341097bd-cb10-4e9e-8154-e60b550e80bf)
 
 This is why we will run the `terraform apply` command in two stages as you will see eventually.
 
@@ -863,7 +863,7 @@ First run `tf init` to install all the added modules.
 tf init
 ```
 
-(image 4)
+![install-modules](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/a88db47c-8a6b-439b-8965-63c704a62007)
 
 ### Validate Configuration
 
@@ -872,6 +872,8 @@ Next you can run the validate command to validate your configuration
 ```sh
 tf validate
 ```
+
+![tf-validate](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/a07e20b9-fd32-485e-adeb-c39f34017d4e)
 
 ### Create Infrastructure
 
@@ -885,9 +887,11 @@ First run:
 tf apply --target module.certificate
 ```
 
-(image 13)
-(image 8)
-(image 9)
+![--target-command](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/f07df8ed-62ff-4f6f-91a2-d6b25a6ba79d)
+
+![--target](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/da124980-b8c5-43f3-a3ea-f47d072ef997)
+
+![--target-created](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/bcea131c-f001-4301-94bb-c893010628dc)
 
 Lastly, create the remaining resources:
 
@@ -895,8 +899,9 @@ Lastly, create the remaining resources:
 tf apply
 ```
 
-(image 10)
-(image 14)
+![tf-apply](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/d0fc99a0-a838-4e08-b3f0-38ca776405de)
+
+![applied](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/fcdd92b8-c344-4dd3-a53d-1d9daf85ea36)
 
 ### Confirm Build
 
@@ -904,7 +909,7 @@ You can open your AWS console to see that the resources have been built.
 
 Open your browser and navigate to your custom domain and you will see that your website is showing, here is mine.
 
-(image 11)
+![hosted-page](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/a40eb65e-c8e6-4ab9-89b1-bc00b99f41a0)
 
 # Cleanup
 
@@ -916,5 +921,6 @@ Use the destroy command:
 tf destroy
 ```
 
-(image 12)
-(image 15)
+![destroy](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/67ae1127-6987-4fc5-9565-d1b74fc3aae2)
+
+![destroyed](https://github.com/ChigozieCO/altschool-3rd-semester/assets/107365067/11b612c9-7d13-4069-b1cc-dd0bf740b5f8)
