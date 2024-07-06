@@ -23,7 +23,7 @@ module "cloudfront" {
   depends_on = [ module.route53 ]
 }
 
-# Import the hosted zone from AWS, create dns records for certificate validation, and create A and CNAME records.
+# Retrieve details of the hosted zone from AWS, create dns records for certificate validation, and create A record.
 module "route53" {
   source = "./Modules/route53"
   domain_name = var.domain_name
@@ -57,6 +57,7 @@ module "route53" {
 #   depends_on = [module.route53]
 # }
 
+# Create an alias to point the cloudfront cdn to our domain name.
 module "alias" {
   source = "./Modules/alias"
   domain_name = var.domain_name

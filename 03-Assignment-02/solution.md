@@ -1,4 +1,10 @@
+Automation is queen in this side of our world, the more of your work you can automate, the better.
+
+The use of Terraform is very necessary for cloud engineers in order to automate deployments of your infrastructure. Terraform is an infrastructure as code tool that lets you define infrastructure resources in human-readable configuration files that you can version, reuse, and share. You can then use a consistent workflow to safely and efficiently provision and manage your infrastructure throughout its lifecycle.
+
 # Terraform Provider and Initialize Terraform
+
+You can find the complete terraform configuration code for the infrastructure we will be building today [here](https://github.com/ChigozieCO/altschool-3rd-semester/tree/main/03-Assignment-02).
 
 To begin I will create a `main.tf` file and a `provider.tf` file for my root module. The first order of business is to configure the AWS provider for Terraform and initialize to get it ready to deploy AWS resources.
 
@@ -91,6 +97,7 @@ The significance of using a variable file is for simplicity and easy refactoring
 Now to the creation of the S3 bucket, we will add the `aws_s3_bucket` resource block to the module's `main.tf` file as shown below.
 
 ```hcl
+# Create S3 Bucket
 resource "aws_s3_bucket" "site-bucket" {
   bucket = var.bucket-name
   force_destroy = true
@@ -116,7 +123,7 @@ output "bucket_regional_domain_name" {
 
 #### `main.tf`
 
-To test that this module works we will create an s3 bucket using this module we have jut written. Head to the `main.tf` file of your root module, outside your `Module` directory and enter the below piece of code in the file.
+To test that this module works we will create an s3 bucket using this module we have just written. Head to the `main.tf` file of your root module, outside your `Module` directory and enter the below piece of code in the file.
 
 ```hcl
 module "s3-bucket" {
@@ -159,11 +166,11 @@ bucket-name = "<your unique bucket name>
 
 :warning: **NOTE**
 
-Your `.tfvars` file should never be committed to version control, ad this file to your `.gitignore` file. Check out my [`.gitignore` file](https://github.com/ChigozieCO/altschool-3rd-semester/blob/main/03-Assignment-02/.gitignore) for files to add to yours.
+Your `.tfvars` file should never be committed to version control, add this file to your `.gitignore` file. Check out my [`.gitignore` file](https://github.com/ChigozieCO/altschool-3rd-semester/blob/main/03-Assignment-02/.gitignore) for files to add to yours.
 
 You can also use [this site](https://www.toptal.com/developers/gitignore/) to generate your gitignore files for this project and future projects.
 
-In your terminal, run the `terraform init` command again, your must rerun the command when you add a module or change provider. If you fail to run it and run any other terraform command you will get the below error message.
+In your terminal, run the `terraform init` command again, you must rerun the command when you add a module or change provider. If you fail to run it and run any other terraform command you will get the below error message.
 
 (image 2)
 
@@ -213,7 +220,7 @@ To now use the command we set as alias we need to run that bash profile script f
 source ~/.bash_profile
 ```
 
-Now I can use tf instead of terraform
+Now we can use tf instead of terraform
 
 ## Upload Assets Into S3 Bucket
 
@@ -229,7 +236,7 @@ It does not make sense to just copy and paste the Terraform resource blocks with
 # Upload objects into the s3 Bucket
 resource "aws_s3_object" "upload-assets" {
   for_each = fileset("${var.web-assets-path}", "**/*")
-  bucket = aws_s3_bucket.site-bucket.id
+  bucket = aws_s3_bucket.site-bucket.bucket
   key = each.value
   source = "${var.web-assets-path}/${each.value}"
   content_type = lookup(var.mime_types, regex("\\.[^.]+$", each.value), "application/octet-stream")
@@ -242,7 +249,7 @@ The path isn't hardcoded, it is defined as a variable in the `variable.tf` file 
 
 The `for_each` loop over `fileset` returns file paths, not key-value pairs, this is why we use `each.value` as our key and not `each.key`.
 
-We want the website to recognise each file type for it's correct respective MIME type an display it properly on the website and that is why we used the `lookup` function in the `content_type` argument. `lookup(map, key, default)` is a function that searches for key in map and returns the associated value if found. If key is not found, it returns default.
+We want the website to recognise each file type for it's correct respective MIME type and display it properly on the website which is why we used the `lookup` function in the `content_type` argument. `lookup(map, key, default)` is a function that searches for key in map and returns the associated value if found. If key is not found, it returns default.
 
 The regex function extracts the file extension from each.value, which is the file name obtained from fileset in other to determine a more accurate MIME type.
 
@@ -309,25 +316,31 @@ Your root module's `terraform.tfvars` file should now look like this:
 
 ```
 bucket-name = "<your unique bucket name>
-web-assets-path = "<the path to your website files>
+web-assets-path = "<the path to your website files (best to supply the absolute path)>
 ```
 
-# Create Hosted Zone in Route53 and import it into Terraform
+# Create Hosted Zone in Route53
+
+:warning: Note 
+
+Even if you are still eligible for the AWS free tier, the Route53 service is never free. This hosted zone will attract a charge of $0.50 per month.
 
 You need a custom domain name for this step, so if you don't already have one, pause, get one and continue along.
 
-This step is going to be completed manually and then we will import the resource into terraform. The reason is simply, when you create a hosted zone, you are given a new set of name servers which you will need to add to your custom domain configuration. Terraform don't not have the infrastructure to complete this step and so your configuration will fail if you don't do propagate your name servers yourself.
+This step is going to be completed manually, initially I was going to import the resource into terraform after manually creating it but upon further consideration we have no reason to as I wouldn't want Terraform deleting the hosted zone. 
 
-Since we already know this, we will manually create the hosted zone, add the name servers to our custom domain and then import the hosted zone resource into terraform to avoid any issues that might have arisen.
+The reason for creating the hosted zone manually is simply because when you create a hosted zone, you are given a new set of name servers which you will need to add to your custom domain configuration. Terraform does not have the infrastructure to complete this step and so your configuration will fail until you manually add your name servers to your custom domain yourself.
+
+Since we already know this, we will manually create the hosted zone, add the name servers to our custom domain and then, using the terraform `data` resource, retrieve details of the created hosted zone into terraform to avoid any issues that might have arisen.
 
 ## Create Hosted Zone
 
-- Open your AWS management console.
+- Open your [AWS management console](https://aws.amazon.com/).
 - In `Services` under the `Network and Content delivery` category choose `Route53`
 - Select `create hosted zone`
-- It's pretty straightforward fom there, enter your domain name in the space for `domain name`.
+- It's pretty straightforward from there, enter your domain name in the space for `domain name`.
 - Select `public hosted zone` under `type`.
-- You can add a tag nd description if you want.
+- You can add a tag and description if you want.
 - At the bottom of the page, click on `create hosted zone`.
 
 (image 3)
@@ -335,9 +348,9 @@ Since we already know this, we will manually create the hosted zone, add the nam
 - Once your hosted zone has been created, open it to view details and copy the name servers supplied by AWS.
 - Copy each name server and replace those already in our domain name with these new ones.
 
-## Import the Hosted Zone Resource into Terraform Configuration
+## Retrieve the Details of the Hosted Zone Resource into Terraform Configuration
 
-To import our hosted zone resource we will create a new module in the `Module` directory called `route53`.
+To add details of our hosted zone resource  to terraform we will create a new module in the `Module` directory called `route53`.
 
 #### `Modules/route53/main.tf`
 
@@ -348,23 +361,10 @@ Add the following code to the file:
 data "aws_route53_zone" "created" {
   name = var.domain_name
 }
-
-# Define the imported Route 53 hosted zone
-resource "aws_route53_zone" "assign-domain" {
-  name = var.domain_name
-
-  # Add a lifecycle rule cos we don't want terraform to destroy the imported hosted zone
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-# Import the already created hosted zone
-import {
-  to = aws_route53_zone.assign-domain
-  id = data.aws_route53_zone.created
-}
 ```
+
+The above code might not look like much but it will retrieve the details of the hosted zone in our AWS account that matches the name we supply and then using it wherever we call that specific `data` resource in our configuration.
+
 
 #### `Modules/route53/variables.tf`
 
@@ -384,7 +384,7 @@ This is not a one stage process in terraform, we will need to first create the r
 
 ## Create Certificate
 
-We will create our certificate before our cloudfront distribution as we will use our SSl certificate in our cloudfront distribution. 
+We will create our certificate before our cloudfront distribution as we will use our SSL certificate in our cloudfront distribution. 
 
 As usual, create a `certificate` directory in the `Module` directory which will house our certificate module. Create 3 new files in that directory `main.tf`, `variable.tf` and `output.tf`.
 
@@ -395,6 +395,7 @@ As usual, create a `certificate` directory in the `Module` directory which will 
 resource "aws_acm_certificate" "cert" {
   domain_name               = var.domain_name
   validation_method         = var.validation_method
+  subject_alternative_names = var.subject_alternative_names
 
   # Ensure that the resource is rebuilt before destruction when running an update
   lifecycle {
@@ -422,7 +423,7 @@ variable "validation_method" {
 variable "subject_alternative_names" {
   description = "Set of domains that should be SANs in the issued certificate."
   type = list(string)
-  default = ["www"]
+  default = []
 }
 ```
 
@@ -433,6 +434,10 @@ Define the outputs we will need to reference in other modules
 ```hcl
 output "cert-arn" {
   value = aws_acm_certificate.cert.arn
+}
+
+output "domain_validation_options" {
+  value = aws_acm_certificate.cert.domain_validation_options
 }
 ```
 
@@ -446,13 +451,41 @@ We will create this record in route53 so head on to your `Modules/route53/main.t
 
 ```hcl
 # Create DNS record that will be used for our certificate validation
-resource "aws_route53_record" "cert-dns" {
-  allow_overwrite = true
-  name            = module.certificate.aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
-  records         = [module.certificate.aws_acm_certificate.cert.domain_validation_options[0].resource_record_value]
-  type            = module.certificate.aws_acm_certificate.cert.domain_validation_options[0].resource_record_name
-  zone_id         = aws_route53_zone.assign-domain.zone_id
-  ttl             = 60
+resource "aws_route53_record" "cert_validation" {
+  for_each   = { for dvo in var.domain_validation_options : dvo.domain_name => {
+    name     = dvo.resource_record_name
+    type     = dvo.resource_record_type
+    record   = dvo.resource_record_value
+  } }
+
+  name       = each.value.name
+  type       = each.value.type
+  records    = [each.value.record]
+  ttl        = 60
+  zone_id  = data.aws_route53_zone.created.zone_id
+}
+```
+
+The code above will create a CNAME record in your domain's hosted zone which will be used to validate the certificate which you created. However if you try to apply the code to create te certificate and create the record at the same time, yu will get an error message that looks like the own below
+
+
+(image ? for_each error)
+
+This is why we will run the `terraform apply` command in two stages as you will see eventually.
+
+#### `Modules/route53/variables.tf`
+
+Add the following to your route53 module variables file
+
+```hcl
+variable "domain_validation_options" {
+  description             = "The domain validation options from the ACM certificate."
+  type                    = list(object({
+    domain_name           = string
+    resource_record_name  = string
+    resource_record_type  = string
+    resource_record_value = string
+  }))
 }
 ```
 
@@ -460,15 +493,43 @@ resource "aws_route53_record" "cert-dns" {
 
 The `aws_acm_certificate` resource does not handle the certificate validation in terraform, we need to use the `aws_acm_certificate_validation` resource to accomplish that.
 
+As I earlier explained and you saw from the error message, the certificate first needs exist and the value of the `domain_validation_options` known first before terraform will honour our for_each statement, this is why we need to first create the certificate, then the record and then verify.
+
+For the above reason we won't put the validation step in the certificate module but in the Route53 module, therefore open your `Route53` module.
+
 The code for the actual validation is seen below:
 
-#### `Modules/certificate/main.tf`
+#### `Modules/route53/main.tf`
 
 ```hcl
 # Validate the certificate
 resource "aws_acm_certificate_validation" "validate-cert" {
-  certificate_arn = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [module.route53.cert_dns_fqdn]
+  certificate_arn = var.certificate_arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+
+  depends_on = [aws_route53_record.cert_validation]
+}
+```
+
+The `depends_on` argument will force terraform to create the `aws_route53_record.cert_validation` resource first before attempting to validate our certificate.
+
+#### `Modules/route53/variables.tf`
+
+Add the required variables to the module's variables.tf file
+
+```hcl
+variable "certificate_arn" {
+  type = string
+}
+```
+
+#### `Modules/route53/outputs.tf`
+
+Add the following to your route53 module outputs.tf file 
+
+```hcl
+output "dns_records" {
+  value = aws_route53_record.cert_validation
 }
 ```
 
@@ -480,7 +541,7 @@ Now we can go ahead and create our cloudfront distribution. Create a `cloudfront
 
 ## Create Origin Access Control - OAC
 
-The first thing we need to do is to create the `Origin Access Control` we will use in the configuration of our distribution. Do this by add the code below to your `main.tf` file:
+The first thing we need to do is to create the `Origin Access Control` we will use in the configuration of our distribution. Do this by adding the code below to your `main.tf` file:
 
 #### `Modules/cloudfront/main.tf`
 
@@ -495,6 +556,36 @@ resource "aws_cloudfront_origin_access_control" "assign-oac" {
 }
 ```
 
+#### `Modules/cloudfront/variables.tf`
+
+Declare the variables:
+
+```hcl
+variable "oac-name" {
+  description = "This is the name of the cloudfront origin Access control with s3 bucket origin domain"
+  type = string
+  default = "s3-bucket-oac"
+}
+
+variable "origin_access_control_origin_type" {
+  description = "The origin type must be the same as the origin domain"
+  type = string
+  default = "s3"
+}
+
+variable "signing_behavior" {
+  description = "Specifies which requests CloudFront signs."
+  type = string
+  default = "always"
+}
+
+variable "signing_protocol" {
+  description = "Determines how CloudFront signs (authenticates) requests."
+  type = string
+  default = "sigv4" # The only valid value
+}
+```
+
 ## Create Distribution
 
 Now we can create our distribution. Add the following in the `main.tf` file:
@@ -505,8 +596,8 @@ Now we can create our distribution. Add the following in the `main.tf` file:
 # Create CloudFront Distribution
 resource "aws_cloudfront_distribution" "cdn" {
   origin {
-    domain_name              = module.s3-bucket.bucket_regional_domain_name
-    origin_id                = module.s3-bucket.bucket_regional_domain_name
+    domain_name              = var.cdn-domain_name-and-origin_id
+    origin_id                = var.cdn-domain_name-and-origin_id
     origin_access_control_id = aws_cloudfront_origin_access_control.assign-oac.id
   }
 
@@ -515,7 +606,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = [ "GET", "HEAD" ]
     cached_methods         = [ "GET", "HEAD" ]
-    target_origin_id       = module.s3-bucket.bucket_regional_domain_name
+    target_origin_id       = var.cdn-domain_name-and-origin_id
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
@@ -535,7 +626,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = module.certificate.cert-arn
+    acm_certificate_arn            = var.acm_certificate_arn
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2021"
     cloudfront_default_certificate = false
@@ -544,7 +635,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = var.default_root_object
-  aliases             = [var.domain_name, "www.${var.var.domain_name}"] 
+  aliases             = [var.domain_name, "www.${var.domain_name}"] 
 }
 ```
 
@@ -553,8 +644,29 @@ resource "aws_cloudfront_distribution" "cdn" {
 Add the required variables
 
 ```hcl
-output "cloudfront-arn" {
-  value = aws_cloudfront_distribution.cdn.arn
+variable "restriction_type" {
+  description = "Method that you want to use to restrict distribution of your content by country"
+  type = string
+  default = "none"
+}
+
+variable "default_root_object" {
+  description = "Object that you want CloudFront to return when an end user requests the root URL."
+  type = string
+  default = "index.html"
+}
+
+variable "domain_name" {
+  description = "your custom Domain name for which the certificate should be issued"
+  type = string
+}
+
+variable "cdn-domain_name-and-origin_id" {
+  type = string
+}
+
+variable "acm_certificate_arn" {
+  type = string
 }
 ```
 
@@ -616,36 +728,46 @@ resource "aws_s3_bucket_policy" "cloudfront-oac-policy" {
 
 # Create CloudFront Distribution Alias Record
 
-#### `Modules/route53/main.tf`
+We will create a new module, specially for this, create a new module called `alias`, create two files `main.tf` and `variables.tf`.
+
+#### `Modules/alias/main.tf`
 
 ```hcl
+# Retrieve information about your hosted zone from AWS
+data "aws_route53_zone" "created" {
+  name = var.domain_name
+}
+
 # Create an alias that will point to the cloudfront distribution domain name
 resource "aws_route53_record" "alias" {
-  zone_id = aws_route53_zone.assign-domain.id
-  name    = var.domain_name
-  type    = "A"
+  zone_id                  = data.aws_route53_zone.created.zone_id
+  name                     = var.domain_name
+  type                     = "A"
 
   alias {
-    name                   = module.cloudfront.cloudfront_domain_name
-    zone_id                =  module.cloudfront.cloudfront_hosted_zone_id
+    name                   = var.cloudfront_domain_name
+    zone_id                = var.cloudfront-zone-id
     evaluate_target_health = false
   }
 }
 ```
 
-# Create CNAME Record for WWW Subdomain
+#### `Modules/alias/variables.tf`
 
-Create a CNAME record in Route 53 for the www subdomain to point to the main domain.
-
-#### `Modules/route53/main.tf`
+Declare the necessary variables as usual:
 
 ```hcl
-resource "aws_route53_record" "www" {
-  zone_id =  module.cloudfront.cloudfront_hosted_zone_id
-  name    = "www.${var.domain_name}"
-  type    = "CNAME"
-  ttl     = 300
-  records = [var.domain_name]
+variable "domain_name" {
+  description = "your custom domain name"
+  type = string
+}
+
+variable "cloudfront_domain_name" {
+  type = string
+}
+
+variable "cloudfront-zone-id" {
+  type = string
 }
 ```
 
@@ -657,3 +779,76 @@ It's now time to put our modules to use in building our infrastructure. We do th
 
 We had previously added our s3-bucket module to our main.tf earlier in the project when we wanted to test out our s3-bucket module, now we will add the rest of our modules to the `main.tf`.
 
+Your final configuration in your `main.tf` of your root module should look like this:
+
+```hcl
+# Create S3 bucket, upload objects into the bucket and set bucket policy.
+module "s3-bucket" {
+  source = "./Modules/s3-bucket"
+  bucket-name = var.bucket-name
+  web-assets-path = var.web-assets-path
+}
+
+# Create and validate TLS/SSL certificate
+module "certificate" {
+  source = "./Modules/certificate"
+  domain_name = var.domain_name
+  subject_alternative_names  = ["www.${var.domain_name}"]
+  }
+
+# Create OAC and cloudfront distribution, 
+module "cloudfront" {
+  source = "./Modules/cloudfront"
+  domain_name = var.domain_name
+  cdn-domain_name-and-origin_id = module.s3-bucket.bucket_regional_domain_name
+  acm_certificate_arn = module.certificate.cert-arn
+  depends_on = [ module.route53 ]
+}
+
+# Import the hosted zone from AWS, create dns records for certificate validation, and create A and CNAME records.
+module "route53" {
+  source = "./Modules/route53"
+  domain_name = var.domain_name
+  domain_validation_options = module.certificate.domain_validation_options
+  certificate_arn = module.certificate.cert-arn
+  }
+
+# Create an alias to point the cloudfront cdn to our domain name.
+module "alias" {
+  source = "./Modules/alias"
+  domain_name = var.domain_name
+  cloudfront_domain_name = module.cloudfront.cloudfront_domain_name
+  cloudfront-zone-id = module.cloudfront.cloudfront_hosted-zone_id
+  depends_on = [ module.cloudfront ]
+}
+```
+
+#### `variables.tf`
+
+Now we will declare the necessary variables, your final variable.tf file should look like this:
+
+```hcl
+variable "bucket-name" {
+  type = string
+}
+
+variable "web-assets-path" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
+}
+```
+
+#### `terraform.tfvars`
+
+Add your secrets to your `*.tfvars` file like so:
+
+```hcl
+bucket-name = "<your unique bucket name>
+web-assets-path = "<the path to your website files (best to supply the absolute path)>
+domain_name = "<your custom domain name>"
+```
+
+Now we are all set to deploy our application
